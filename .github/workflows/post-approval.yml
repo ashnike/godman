@@ -1,0 +1,36 @@
+name: Post-Approval Checks
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  post-approval:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.18'
+
+    - name: Deploy for E2E Testing
+      run: echo "Deploying for E2E Testing..."
+
+    - name: Run E2E Tests
+      run: echo "Running E2E Tests..."
+
+    - name: Deploy for Performance Testing
+      run: echo "Deploying for Performance Testing..."
+
+    - name: Seed Mock Users and Run Performance Tests
+      run: echo "Seeding Mock Users and Running Performance Tests..."
+
+    - name: Check Performance Metrics
+      run: echo "Checking Performance Metrics..."
+      env:
+        NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
