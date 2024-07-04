@@ -1,0 +1,24 @@
+name: Merge and Tag
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  merge-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Create Build Tag
+      id: tag
+      run: |
+        TAG="build-$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+        echo "::set-output name=tag::$TAG"
+        git tag $TAG
+        git push origin $TAG
+
+    - name: Notify QA
+      run: echo "New build tag created: ${{ steps.tag.outputs.tag }} and ready for QA testing"
