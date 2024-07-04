@@ -1,0 +1,38 @@
+name: Pre-Approval Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  pre-approval:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Pull Latest Changes from Main
+      run: git pull origin main
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.16'
+
+    - name: Install Dependencies
+      run: go mod download
+
+    - name: Run Unit Tests
+      run: go test ./...
+
+    - name: Run Coverage Check
+      run: go test -cover ./...
+
+    - name: Run SonarQube Analysis
+      uses: sonarsource/sonarqube-scan-action@v1
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Run Lint Check
+      run: golangci-lint run
