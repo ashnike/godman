@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_tag:
+        description: 'Build Tag'
+        required: true
+      release_type:
+        description: 'Release Type (Hotfix/Feature)'
+        required: true
+        default: 'Feature'
+        options:
+          - Hotfix
+          - Feature
+      release_server:
+        description: 'Release Server (Beta/GA)'
+        required: true
+        default: 'Beta'
+        options:
+          - Beta
+          - GA
+      environment:
+        description: 'Environment (Stage/Pre-Prod/Prod)'
+        required: true
+        default: 'Stage'
+        options:
+          - Stage
+          - Pre-Prod
+          - Prod
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Deploy to Environment
+      if: github.event.inputs.release_type == 'Hotfix' || (github.event.inputs.release_type == 'Feature' && github.event.inputs.release_server == 'Beta')
+      run: echo "Deploying to ${{ github.event.inputs.release_server }} environment..."
+
+    - name: Perform Post-Release Checks
+      if: github.event.inputs.release_type == 'Feature' && github.event.inputs.release_server == 'GA'
+      run: echo "Performing Post-Release Checks..."
